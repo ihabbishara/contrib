@@ -1,0 +1,36 @@
+{
+  "name": "flogo-jwtbuilder",
+  "type": "flogo:activity",
+  "version": "1.0.0",
+  "title": "JWTBuilder Activity",
+  "description": "Generate JWT Token",
+  "homepage": "https://github.com/project-flogo/contrib/tree/master/activity/jwtbuilder",
+  "input": [
+    {
+      "name": "privateKey",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "audience",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "subject",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "issuer",
+      "type": "string",
+      "required": true
+    }
+  ],
+  "output": [
+    {
+      "name": "jwttoken",
+      "type": "string"
+    }
+  ]
+}
