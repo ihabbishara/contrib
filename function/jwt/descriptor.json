@@ -1,0 +1,46 @@
+{
+  "name": "jwt",
+  "type": "flogo:function",
+  "version": "0.1.0",
+  "title": "JWT Token Generator",
+  "description": "Generate JWT Token by providing the claims as input",
+  "homepage": "https://github.com/project-flogo/contrib/tree/master/function/jwt",
+  "functions": [
+    {
+      "name": "generateJWT",
+      "description": "Generate JWT Token by providing the claims as input",
+      "example": "jwt.generateJWT(\"privateKey\",\"aud\",\"iss\",\"sub\",\"exp\") => token string",
+      "varArgs": true,
+      "args": [
+        {
+          "name": "privateKey",
+          "type": "string",
+          "value": "privateKey"
+        },
+        {
+          "name": "audience",
+          "type": "string",
+          "value": "audience"
+        },
+        {
+          "name": "issuer",
+          "type": "string",
+          "value": "issuer"
+        },
+        {
+          "name": "subject",
+          "type": "string",
+          "value": "subject"
+        },
+        {
+          "name": "expiry",
+          "type": "int",
+          "value": 180
+        }
+      ],
+      "return": {
+        "type": "string"
+      }
+    }
+  ]
+}
