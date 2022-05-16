@@ -10,7 +10,6 @@
       "name": "generateJWT",
       "description": "Generate JWT Token by providing the claims as input",
       "example": "jwt.generateJWT(\"privateKey\",\"aud\",\"iss\",\"sub\",\"exp\") => token string",
-      "varArgs": true,
       "args": [
         {
           "name": "privateKey",
