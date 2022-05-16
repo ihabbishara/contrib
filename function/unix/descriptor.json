@@ -1,0 +1,18 @@
+{
+  "name": "unix",
+  "type": "flogo:function",
+  "version": "0.10.0",
+  "title": "unixFunctions",
+  "description": "unixFunctions",
+  "functions": [
+{
+  "name": "timestamp",
+  "description": "Returns the current unix timestamp (Unix epoch time the number of milliseconds since midnight, January 1, 1970 UTC)",
+  "example": "unix.timestamp() => 1652734838",
+  "args": [],
+  "return": {
+    "type": "integer"
+  }
+}
+  ]
+}
