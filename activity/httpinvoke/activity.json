@@ -6,7 +6,7 @@
   "description": "HTTP Method uri-part pass through activity",
   "ref": "github.com/ihabbishara/contrib/tree/master/activity/httpinvoke",
   "display": {
-    "category": "NGI HTTP Custom Pallets",
+    "category": "LeasePlanHTTPCustom",
     "description": "HTTP Custom Trigger and Activity",
     "visible": true,
     "smallIcon": "ic-http-request.png"
