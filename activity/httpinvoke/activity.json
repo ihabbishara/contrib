@@ -5,7 +5,6 @@
   "title": "HTTP Invoke Client",
   "description": "HTTP Method uri-part pass through activity",
   "ref": "github.com/ihabbishara/contrib/tree/master/activity/httpinvoke",
-  "homepage": "https://github.com/ihabbishara/contrib/tree/master/activity/httpinvoke",
   "display": {
     "category": "NGI HTTP Custom Pallets",
     "description": "HTTP Custom Trigger and Activity",
