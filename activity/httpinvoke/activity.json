@@ -21,15 +21,23 @@
         "description": "Choose the HTTP Method for the invocation from the list"
       },
       "value": false
-    },
-    {
+    },{
       "name": "method",
       "type": "string",
       "required": true,
+      "allowed": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH"
+      ],
+      "value": "LIST",
       "display": {
-        "name": "Explicit Method",
-        "description": "explicit http method",
-        "appPropertySupport": true,
+        "name": "Method",
+        "description": "Choose the HTTP Method for the invocation",
+        "type": "dropdown",
+        "selection": "single",
         "visible": false
       }
     },
@@ -59,8 +67,13 @@
     {
       "name": "timeout",
       "type": "int",
-      "description" : "The request timeout in seconds",
-      "appPropertySupport": true
+      "required": true,
+      "display": {
+        "name": "timeout (in seconds)",
+        "description": "Response timeout in seconds",
+        "appPropertySupport": true,
+        "visible": true
+      }
     },
     {
       "name": "sslConfig",
