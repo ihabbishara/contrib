@@ -4,7 +4,7 @@ import {
 } from "wi-studio/app/contrib/wi-contrib";
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { HttpModule, Http } from "@angular/httpinvoke";
+import { HttpModule, Http } from "@angular/http";
 import { httpinvokeHandler } from "./httpinvokeHandler";
 @NgModule({
   imports: [

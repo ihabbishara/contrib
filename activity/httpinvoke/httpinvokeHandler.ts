@@ -1,6 +1,6 @@
 
 import {Injectable, Injector, Inject} from "@angular/core";
-import {Http} from "@angular/httpinvoke";
+import {Http} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 import {
     WiContrib,
