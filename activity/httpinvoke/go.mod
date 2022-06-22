@@ -1,4 +1,4 @@
-module gitlab.core-services.leaseplan.systems/workloads/0026-wkl-ng-integration/integration/shared/flogorestactivity
+module github.com/ihabbishara/contrib/tree/master/activity/httpinvoke
 
 require (
 	github.com/project-flogo/core v1.6.0
