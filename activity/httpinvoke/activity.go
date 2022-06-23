@@ -3,6 +3,7 @@ package httpinvoke
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/project-flogo/core/activity"
 	"github.com/project-flogo/core/data/metadata"
-	"github.com/project-flogo/core/support/ssl"
 )
 
 func init() {
@@ -39,7 +39,7 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 	}
 
 	act := &Activity{settings: s}
-	act.containsParam = strings.Index(s.Uri, "/:") > -1
+	act.containsParam = true
 
 	client := &http.Client{}
 
@@ -61,34 +61,34 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		httpTransportSettings.Proxy = http.ProxyURL(proxyURL)
 	}
 
-	if strings.HasPrefix(s.Uri, "https") {
-		cfg := &ssl.Config{}
-
-		if len(s.SSLConfig) != 0 {
-			err := cfg.FromMap(s.SSLConfig)
-			if err != nil {
-				return nil, err
-			}
-
-			if _, set := s.SSLConfig["skipVerify"]; !set {
-				cfg.SkipVerify = true
-			}
-			if _, set := s.SSLConfig["useSystemCert"]; !set {
-				cfg.UseSystemCert = true
-			}
-		} else {
-			//using ssl but not configured, use defaults
-			cfg.SkipVerify = true
-			cfg.UseSystemCert = true
-		}
-
-		tlsConfig, err := ssl.NewClientTLSConfig(cfg)
-		if err != nil {
-			return nil, err
-		}
-
-		httpTransportSettings.TLSClientConfig = tlsConfig
-	}
+	//if strings.HasPrefix(s.Uri, "https") {
+	//	cfg := &ssl.Config{}
+	//
+	//	if len(s.SSLConfig) != 0 {
+	//		err := cfg.FromMap(s.SSLConfig)
+	//		if err != nil {
+	//			return nil, err
+	//		}
+	//
+	//		if _, set := s.SSLConfig["skipVerify"]; !set {
+	//			cfg.SkipVerify = true
+	//		}
+	//		if _, set := s.SSLConfig["useSystemCert"]; !set {
+	//			cfg.UseSystemCert = true
+	//		}
+	//	} else {
+	//		//using ssl but not configured, use defaults
+	//		cfg.SkipVerify = true
+	//		cfg.UseSystemCert = true
+	//	}
+	//
+	//	tlsConfig, err := ssl.NewClientTLSConfig(cfg)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//
+	//	httpTransportSettings.TLSClientConfig = tlsConfig
+	//}
 
 	client.Transport = httpTransportSettings
 	act.client = client
@@ -120,10 +120,9 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		return false, err
 	}
 
-	uri := a.settings.Uri
-	if a.settings.UseEnvProp == "YES" {
-		uri = replaceSubString(uri, input.EnvPropUri)
-	}
+	uri := "{envProp}/:restOfThePath" //TODO: check how complicated is it to remove this logic
+	uri = replaceSubString(uri, input.ProxyPass)
+
 	if a.containsParam {
 		if len(input.PathParams) == 0 && strings.Index(strings.Replace(uri, ":restOfThePath", "", 1), "/:") > -1 {
 			err := activity.NewError("Path Params not specified, required for URI: "+uri, "", nil)
@@ -145,13 +144,14 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		uri = uri + "?" + qp.Encode()
 	}
 
-	method := a.settings.Method
-	if method == methodTRIGGER {
-		method = input.Method
+	method := input.Method
+	if method == "" {
+		err := errors.New("Method input cannot be EMPTY.")
+		logger.Errorf("Method input cannot be EMPTY.")
+		return false, err
 	}
-	if logger.DebugEnabled() {
-		logger.Debugf("REST Call: [%s] %s", method, uri)
-	}
+
+	logger.Infof("REST Call: [%s] %s", method, uri)
 
 	var reqBody io.Reader
 
@@ -180,7 +180,8 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		req.Header.Set("Content-Type", contentType)
 	}
 
-	headers := a.getHeaders(input.Headers)
+	headers := a.getHeaders(input.Headers, input.AdditionalHeaders)
+
 	if len(headers) > 0 {
 		for key, value := range headers {
 			if strings.HasPrefix(key, "X-Forwarded") {
@@ -284,24 +285,15 @@ func replaceSubString(uri string, replacement string) string {
 	return strings.Replace(uri, uri[startChar:endChar+1], replacement, 1)
 }
 
-func (a *Activity) getHeaders(inputHeaders map[string]string) map[string]string {
-
-	if len(inputHeaders) == 0 {
-		return a.settings.Headers
-	}
-
-	if len(a.settings.Headers) == 0 {
-		return inputHeaders
-	}
+func (a *Activity) getHeaders(inputHeaders ...map[string]string) map[string]string {
 
 	headers := make(map[string]string)
-	for key, value := range a.settings.Headers {
-		headers[key] = value
-	}
-	for key, value := range inputHeaders {
-		headers[key] = value
-	}
 
+	for _, headerSet := range inputHeaders {
+		for key, value := range headerSet {
+			headers[key] = value
+		}
+	}
 	return headers
 }
 

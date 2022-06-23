@@ -38,6 +38,37 @@ export class httpinvokeHandler extends WiServiceHandlerContribution {
                 vresult.setVisible(false);
             }
             return vresult;
+        } else if (fieldName === "additionalHeaders") {
+            let vresult: IValidationResult = ValidationResult.newValidationResult();
+            let additionalHeadersField: IFieldDefinition = context.getField(fieldName);
+            let arrHeaderNamesTmp: any[] = [];
+            let errMessage: string = "";
+            let additionalHeadersParsed: any = {};
+
+            try {
+                additionalHeadersParsed = JSON.parse(additionalHeadersField.value.value);
+            } catch (e) { }
+
+            for (let attr of additionalHeadersParsed) {
+                if (!attr.headerName) {
+                    errMessage = "Header Name should not be empty";
+                    vresult.setError("HTTP-Invoke-1000", errMessage);
+                    vresult.setValid(false);
+                    break;
+                } else {
+                    for (let headName of arrHeaderNamesTmp) {
+                        if (headName === attr.headerName) {
+                            errMessage = "Header Name \'" + attr.headerName + "\' already exists";
+                            vresult.setError("HTTP-Invoke-1000", errMessage);
+                            vresult.setValid(false);
+                            break;
+                        }
+                    }
+                    arrHeaderNamesTmp.push(attr.headerName);
+                }
+            }
+            return vresult;
         }
+        return null;
     }
 }

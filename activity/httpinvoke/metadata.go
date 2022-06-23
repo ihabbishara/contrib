@@ -5,37 +5,38 @@ import (
 )
 
 type Settings struct {
-	UseEnvProp    string                 `md:"useEnvProp,default,allowed(YES,NO)"`                // Do we want to use an environment property for the uri
-	Uri           string                 `md:"uri,required"`                                      // The URI of the service to invoke
-	SelectMethod  bool                   `md:"true,false"`                                        // The HTTP method to invoke
-	Method        string                 `md:"method,allowed(TRIGGER,GET,POST,PUT,PATCH,DELETE)"` // The HTTP method to invoke
-	Headers       map[string]string      `md:"headers"`                                           // The HTTP header parameters
-	Proxy         string                 `md:"proxy"`                                             // The address of the proxy server to be use
-	Timeout       int                    `md:"timeout"`                                           // The request timeout in seconds
-	SkipSSLVerify bool                   `md:"skipSSLVerify"`                                     // Skip SSL validation
-	CertFile      string                 `md:"certFile"`                                          // Path to PEM encoded client certificate
-	KeyFile       string                 `md:"keyFile"`                                           // Path to PEM encoded client key
-	CAFile        string                 `md:"CAFile"`                                            // Path to PEM encoded root certificates file
-	SSLConfig     map[string]interface{} `md:"sslConfig"`                                         // SSL Configuration
+	//UseEnvProp        string                 `md:"useEnvProp,default,allowed(YES,NO)"`                // Do we want to use an environment property for the uri
+	//Uri               string                 `md:"uri,required"`                                      // The URI of the service to invoke
+	SelectMethod  bool                   `md:"true,false"`    // The HTTP method to invoke
+	Method        string                 `md:"method"`        // The HTTP method to invoke
+	Proxy         string                 `md:"proxy"`         // The address of the proxy server to be use
+	Timeout       int                    `md:"timeout"`       // The request timeout in seconds
+	SkipSSLVerify bool                   `md:"skipSSLVerify"` // Skip SSL validation
+	CertFile      string                 `md:"certFile"`      // Path to PEM encoded client certificate
+	KeyFile       string                 `md:"keyFile"`       // Path to PEM encoded client key
+	CAFile        string                 `md:"CAFile"`        // Path to PEM encoded root certificates file
+	SSLConfig     map[string]interface{} `md:"sslConfig"`     // SSL Configuration
 }
 
 type Input struct {
-	PathParams  map[string]string `md:"pathParams"`  // The query parameters (e.g., 'id' in http://.../pet?id=someValue )
-	QueryParams map[string]string `md:"queryParams"` // The path parameters (e.g., 'id' in http://.../pet/:id/name )
-	Headers     map[string]string `md:"headers"`     // The HTTP header parameters
-	Content     interface{}       `md:"content"`     // The message content to send. This is only used in POST, PUT, and PATCH
-	Method      string            `md:"method"`      // The HTTP method to use for this request
-	EnvPropUri  string            `md:"envPropUri"`  // Using an environment property for the uri
+	PathParams        map[string]string `md:"pathParams"`        // The query parameters (e.g., 'id' in http://.../pet?id=someValue )
+	QueryParams       map[string]string `md:"queryParams"`       // The path parameters (e.g., 'id' in http://.../pet/:id/name )
+	Headers           map[string]string `md:"headers"`           // The HTTP header parameters
+	AdditionalHeaders map[string]string `md:"additionalHeaders"` // Additional HTTP headers parameters
+	Content           interface{}       `md:"content"`           // The message content to send. This is only used in POST, PUT, and PATCH
+	Method            string            `md:"method"`            // The HTTP method to use for this request
+	ProxyPass         string            `md:"proxyPass"`         // The Base URL of the endpoint
 }
 
 func (i *Input) ToMap() map[string]interface{} {
 	return map[string]interface{}{
-		"pathParams":  i.PathParams,
-		"queryParams": i.QueryParams,
-		"headers":     i.Headers,
-		"content":     i.Content,
-		"method":      i.Method,
-		"envPropUri":  i.EnvPropUri,
+		"pathParams":        i.PathParams,
+		"queryParams":       i.QueryParams,
+		"headers":           i.Headers,
+		"additionalHeaders": i.AdditionalHeaders,
+		"content":           i.Content,
+		"method":            i.Method,
+		"proxyPass":         i.ProxyPass,
 	}
 }
 
@@ -54,12 +55,16 @@ func (i *Input) FromMap(values map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
+	i.AdditionalHeaders, err = coerce.ToParams(values["additionalHeaders"])
+	if err != nil {
+		return err
+	}
 	i.Content = values["content"]
 	i.Method, err = coerce.ToString(values["method"])
 	if err != nil {
 		return err
 	}
-	i.EnvPropUri, err = coerce.ToString(values["envPropUri"])
+	i.ProxyPass, err = coerce.ToString(values["proxyPass"])
 	return nil
 }
 
